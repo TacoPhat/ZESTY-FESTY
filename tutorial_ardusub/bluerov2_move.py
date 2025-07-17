@@ -16,8 +16,22 @@ class publish(Node):
             "/manual_control",
             10
         )
+        self.command_pub = self.create_publisher(
+            OverrideRCIn, "override_rc", 10
+        )
         self.dance()
-
+    def turn_light1_on(self, level):
+        self.get_logger().info(f"Turning light 1 on to level {level}")
+        commands = OverrideRCIn()
+        commands.channels = [OverrideRCIn.CHAN_NOCHANGE] * 10
+        commands.channels[8] = 1000 + level * 10
+        self.command_pub.publish(commands)
+    def turn_light2_on(self, level):
+        self.get_logger().info(f"Turning light 2 on to level {level}")
+        commands = OverrideRCIn()
+        commands.channels = [OverrideRCIn.CHAN_NOCHANGE] * 10
+        commands.channels[9] = 1000 + level * 10
+        self.command_pub.publish(commands)
     def send_manual_control(self, x, y, z, r, t):
         self.get_logger().info("starting function")
         start_time = self.get_clock().now()
