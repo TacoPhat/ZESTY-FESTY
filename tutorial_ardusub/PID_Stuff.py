@@ -21,6 +21,7 @@ class Z_axis_PID(Node):
             self.calculate_depth, 
             10             
         )
+        self.maintain_depth(-3.0,120)
         self.Kp = 0
         self.Ki = 0
         self.Kd = 0
