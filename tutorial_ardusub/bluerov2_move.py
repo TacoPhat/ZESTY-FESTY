@@ -7,30 +7,51 @@ import numpy as np
 import math
 import time
 
-class publish(Node):
+class dance_node(Node):
     def __init__(self):
         super().__init__("bluerow_publisher")
         self.rate = self.create_rate(10.0)
-        self.pub = self.create_publisher(
+        self.manualcontrol_pub = self.create_publisher(
             ManualControl,
             "/manual_control",
             10
         )
+        self.override_pub = self.create_publisher(
+            OverrideRCIn, "override_rc", 10
+        )
         self.dance()
+
+    def turn_light1_on(self, level):
+        self.get_logger().info(f"Turning light 1 on to level {level}")
+        commands = OverrideRCIn()
+        commands.channels = [OverrideRCIn.CHAN_NOCHANGE] * 10
+        commands.channels[8] = 1000 + level * 10
+        self.override_pub.publish(commands)
+
+    def turn_light2_on(self, level):
+        self.get_logger().info(f"Turning light 2 on to level {level}")
+        commands = OverrideRCIn()
+        commands.channels = [OverrideRCIn.CHAN_NOCHANGE] * 10
+        commands.channels[9] = 1000 + level * 10
+        self.override_pub.publish(commands)
 
     def send_manual_control(self, x, y, z, r, t):
         self.get_logger().info("starting function")
         start_time = self.get_clock().now()
+        self.turn_light1_on(100)
+        self.turn_light2_on(100)
         while (self.get_clock().now() - start_time < rclpy.duration.Duration(seconds = t)) & rclpy.ok():
+            elapsed = (self.get_clock().now() - start_time).nanoseconds / 1e9
             msg = ManualControl()
             msg.x = x
             msg.y = y
             msg.z = z
             msg.r = r
-            msg.t = t
-            self.pub.publish(msg)
+            self.manualcontrol_pub.publish(msg)
             # self.get_logger().info("Time: {:.2f}".format(self.get_clock().now() - start_time))
-            time.sleep(.05)
+            time.sleep(.02)
+        self.turn_light1_on(20)
+        self.turn_light2_on(20)
         self.get_logger().info("ending function")
 
 
@@ -40,47 +61,49 @@ class publish(Node):
         self.send_manual_control(40.0, -40.0, 0.0, 0.0, 1.44)
         self.send_manual_control(-40.0,40.0, 0.0, 0.0, 1.44)
         self.send_manual_control(-40.0, -40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(0.0, 0.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(0.0, 65.0, 0.0, 0.0, 1.44)
+        self.send_manual_control(0.0, 60.0, 0.0, 0.0, 1.44)
         self.send_manual_control(0.0, -60.0, 0.0, 0.0, 1.44)
+        self.send_manual_control(5.0, 5.0, 0.0, 0.0, 1.44)
         self.send_manual_control(-40.0, 0.0, 40.0, 0.0, 1.44)
         self.send_manual_control(40.0, 40.0, 0.0, 0.0, 1.44)
         self.send_manual_control(40.0, -40.0, 0.0, 0.0, 1.44)
         self.send_manual_control(-40.0,40.0, 0.0, 0.0, 1.44)
         self.send_manual_control(-40.0, -40.0, 0.0, 0.0, 1.44)
         self.send_manual_control(50.0, 0.0, -60.0, 0.0, 1.44)
-        self.send_manual_control(-50.0, 0.0, -40.0, 0.0, 1.44)
-        self.send_manual_control(5.0, 5.0, 50.0, 30.0, 1.44) 
-        self.send_manual_control(5.0, 5.0, 50.0, 20.0, 1.44) 
-        self.send_manual_control(-5.0, -5.0, 50.0, 10.0, 1.44) 
-        self.send_manual_control(-5.0, -5.0, 0.0, -5.0, 1.44) 
-        self.send_manual_control(40.0, -40.0, 0.0, 0.0, 1.44) 
-        self.send_manual_control(40.0, 40.0, 0.0, 0.0, 1.44) 
-        self.send_manual_control(-40.0, -40.0, 0.0, 0.0, 1.44) 
-        self.send_manual_control(-40.0, 40.0, 0.0, 0.0, 1.44) 
-        self.send_manual_control(40.0, 40.0, 0.0, 0.0, 1.44) 
-        self.send_manual_control(-40.0, -40.0, 0.0, 0.0, 1.44) 
-        self.send_manual_control(0.0, 0.0, 60.0, 0.0, 1.44) 
-        self.send_manual_control(40.0, 40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(40.0, -40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(-40.0, -40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(-40.0, 40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(10.0, 0.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(0.0, -50.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(0.0, 50.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(40.0, 40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(40.0, -40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(-40.0, -40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(-40.0, 40.0, 0.0, 0.0, 1.44)
-        self.send_manual_control(20.0, 0.0, 0.0, 0.0, 1.44)
+        self.send_manual_control(-50.0, 0.0, -60.0, 0.0, 1.44)
+        self.send_manual_control(10.0, 10.0, 50.0, 80.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 50.0, 80.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 40.0, 60.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 30.0, 45.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 20.0, 35.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 0.0, 25.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 0.0, 15.0, 1.44) 
+        self.send_manual_control(10.0, 10.0, 0.0, 5.0, 1.44) 
+        self.send_manual_control(5.0, 5.0, 0.0, 2.0, 1.44) 
+        self.send_manual_control(3.0, 3.0, 0.0, 0.00000001, 1.44) 
+        self.send_manual_control(0.0, 0.0, 60.0, -0.00000001, 1.44) 
+        self.send_manual_control(40.0, 40.0, 0.0, 0.00000001, 1.44)
+        self.send_manual_control(40.0, -40.0, 0.0, -0.00000001, 1.44)
+        self.send_manual_control(-40.0, -40.0, 0.0, 0.00000001, 1.44)
+        self.send_manual_control(-40.0, 40.0, 0.0, -0.00000001, 1.44)
+        self.send_manual_control(10.0, 0.0, 0.0, 0.00000001, 1.44)
+        self.send_manual_control(0.0, -50.0, 0.0, -0.00000001, 1.44)
+        self.send_manual_control(0.0, 50.0, 0.0, 0.00000001, 1.44)
+        self.send_manual_control(40.0, 40.0, 0.0, -0.00000001, 1.44)
+        self.send_manual_control(40.0, -40.0, 0.0, 0.00000001, 1.44)
+        self.send_manual_control(-40.0, -40.0, 0.0, -0.00000001, 1.44)
+        self.send_manual_control(-40.0, 40.0, 0.0, 0.00000001, 1.44)
+        self.send_manual_control(20.0, 0.0, 0.0, -0.00000001, 1.44)
         self.send_manual_control(0.0, 0.0, 0.0, -80.0, 2.88)
         self.send_manual_control(0.0, 0.0, 80.0, 80.0, 4.32)
+        self.send_manual_control(0.0, 0.0, 0.0, 0.0, 1.0)
+
 
     
 
 def main(args=None):
     rclpy.init(args=args)
-    node = publish()
+    node = dance_node()
 
     try:
         rclpy.spin(node)
