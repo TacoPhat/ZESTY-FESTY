@@ -16,8 +16,8 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='viktorosadsky',
-    maintainer_email='viktor.osadsky@gmail.com',
+    maintainer='niche',
+    maintainer_email='nichelle.thinagar@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
@@ -26,7 +26,8 @@ setup(
             'subscriber = tutorial_ardusub.bluerov2_sensors:main',
             'arm = tutorial_ardusub.bluerov2_arm:main',
             'move = tutorial_ardusub.bluerov2_move:main',
-            'heading = tutorial_ardusub.heading:main'
+            'heading = tutorial_ardusub.heading:main',
+            'depth = tutorial_ardusub.depth:main'
         ],
     },
 )
