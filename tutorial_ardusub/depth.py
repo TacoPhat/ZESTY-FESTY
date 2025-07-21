@@ -6,7 +6,6 @@ from std_msgs.msg import Int16, Float64
 from rclpy import timer
 
 
-
 class Z_axis_PID(Node):
     def __init__(self):
         super().__init__("bluerow_publisher")
@@ -21,6 +20,12 @@ class Z_axis_PID(Node):
             self.depth, 
             10             
         )
+        self.create_subscription(
+            Float64,        
+            "/desired_depth",    
+            self.update_target_depth, 
+            10             
+        )
         self.Kp = 0
         self.Ki = 0
         self.Kd = 0
@@ -28,6 +33,10 @@ class Z_axis_PID(Node):
         self.error_accumulator = 0.0
         self.previous_error = 0.0
         self.timestep = 0.02
+    def update_target_depth(self, msg):
+            self.target_depth = msg.data
+            self.get_logger().info(f"[TARGET SET] New target depth: {self.target_depth:.2f}")
+
     def calculate_depth(self, fp, d=1000, g=9.81, atmospheric_pressure=101325.0):
         return -(fp - atmospheric_pressure) / (d * g)
         
@@ -37,9 +46,9 @@ class Z_axis_PID(Node):
         error = (self.target_depth - current_depth)
         self.error_accumulator += error * self.timestep
         derivative = (error - self.previous_error) / self.timestep
-        Kp = 1.0
-        Ki = 0.01
-        Kd = 0.1
+        Kp = 50.0
+        Ki = 0.3
+        Kd = 2.0
         integral = min(Ki * self.error_accumulator, 1.0)
         u = Kp * error + integral + Kd * derivative
         u = max(-100, min(u, 100))

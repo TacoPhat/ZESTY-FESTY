@@ -34,7 +34,7 @@ class headingnode(Node):
         error = (self.target_heading - current_heading + 180) % 360 - 180
         self.error_accumulator += error * self.timestep
         derivative = (error - self.previous_error) / self.timestep
-        Kp = 1.0
+        Kp = 1.1
         Ki = 0.01
         Kd = 0.1
         integral = min(Ki * self.error_accumulator, 1.0)
