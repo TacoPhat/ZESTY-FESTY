@@ -46,7 +46,7 @@ class Z_axis_PID(Node):
         error = (self.target_depth - current_depth)
         self.error_accumulator += error * self.timestep
         derivative = (error - self.previous_error) / self.timestep
-        Kp = 20.0
+        Kp = 50.0
         Ki = 0.3
         Kd = 2.0
         integral = min(Ki * self.error_accumulator, 1.0)
