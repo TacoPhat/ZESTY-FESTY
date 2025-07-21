@@ -16,38 +16,36 @@ class Z_axis_PID(Node):
         self.sub = self.create_subscription(
             FluidPressure,        
             "/pressure",    
-            self.calculate_depth, 
+            self.depth, 
             10             
         )
         self.Kp = 0
         self.Ki = 0
         self.Kd = 0
+        self.target_depth = -3.0
         self.error_accumulator = 0.0
         self.previous_error = 0.0
-        self.maintain_depth(-3.0,120)
-    def calculate_depth(self, msg: FluidPressure, d = 1000, g = 9.81, atmospheric_prssure = 101325.0):
-        self.current_z = (msg.fluid_pressure)/(d*g) + atmospheric_prssure
+        self.timestep = 0.02
+    def calculate_depth(self, fp, d=1000, g=9.81, atmospheric_pressure=101325.0):
+        return -(fp - atmospheric_pressure) / (d * g)
         
-    def depth(self, z, t):
-            self.get_logger().info("starting function")
-            start_time = self.get_clock().now()
-            prev_time = start_time
-            while (self.get_clock().now() - start_time < rclpy.duration.Duration(seconds = t)) & rclpy.ok():
-                error = z - self.current_z
-                proportional = self.Kp * error
-                dt = self.get_clock.now() - prev_time
-                error_accumulator += error * dt
-                integral = min(self.Ki * error_accumulator, 1.0)
-                derivative = self.Kd * (error - previous_error) / dt
-                previous_error = error
-                u = proportional + integral + derivative
-                msg = ManualControl()
-                msg.z = u
-                msg.t = t
-                self.pub.publish(msg)
-                self.prev_time = self.get_clock().now()
-                timer.sleep(0.05)
-            self.get_logger().info("ending function")
+    def depth(self, msg):
+        self.get_logger().info(f"Descending to {self.target_depth}")
+        current_depth = self.calculate_depth(msg.fluid_pressure)
+        error = (self.target_depth - current_depth)
+        self.error_accumulator += error * self.timestep
+        derivative = (error - self.previous_error) / self.timestep
+        Kp = 1.0
+        Ki = 0.01
+        Kd = 0.1
+        integral = min(Ki * self.error_accumulator, 1.0)
+        u = Kp * error + integral + Kd * derivative
+        u = max(-100, min(u, 100))
+        self.previous_error = error
+        move_msg = ManualControl()
+        move_msg.z = float(u)
+        self.pub.publish(move_msg)
+        self.get_logger().info(f"Current: {current_depth}, Target: {self.target_depth}, Cmd: {u:.2f}")
 
 def main(args=None):
         rclpy.init(args=args)
