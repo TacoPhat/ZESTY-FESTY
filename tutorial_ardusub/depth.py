@@ -5,6 +5,37 @@ from mavros_msgs.msg import ManualControl
 from rclpy import timer
 
 
+class Current_Depth(Node):
+    def __init__(self):
+        super().__init__("bluerow_publisher")
+        self.sub = self.create_subscription(
+            FluidPressure,        
+            "/pressure",    
+            self.depth, 
+            10             
+        )
+        self.pub = self.create_publisher(
+            float64,        
+            "/depthNow",    
+            self.depth, 
+            10             
+        )
+    def calculate_depth(self, fp, d=1000, g=9.81, atmospheric_pressure=101.3250):
+        return -(fp - atmospheric_pressure) / (d * g)
+        
+def main1(args=None):
+        rclpy.init(args=args)
+        node = Current_Depth()
+
+        try:
+            rclpy.spin(node)
+        except KeyboardInterrupt:
+            print("\nKeyboardInterrupt received, shutting down...")
+        finally:
+            node.destroy_node()
+            if rclpy.ok():
+                rclpy.shutdown()
+
 class Z_axis_PID(Node):
     def __init__(self):
         super().__init__("bluerow_publisher")
@@ -26,9 +57,6 @@ class Z_axis_PID(Node):
         self.error_accumulator = 0.0
         self.previous_error = 0.0
         self.timestep = 0.02
-    def calculate_depth(self, fp, d=1000, g=9.81, atmospheric_pressure=101325.0):
-        return -(fp - atmospheric_pressure) / (d * g)
-        
     def depth(self, msg):
         self.get_logger().info(f"Descending to {self.target_depth}")
         current_depth = self.calculate_depth(msg.fluid_pressure)

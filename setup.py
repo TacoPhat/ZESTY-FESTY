@@ -28,6 +28,7 @@ setup(
             'move = tutorial_ardusub.bluerov2_move:main',
             'heading = tutorial_ardusub.heading:main',
             'depth = tutorial_ardusub.depth:main'
+            'howDeep = tutorial_ardusub.depth:main1'
         ],
     },
 )
