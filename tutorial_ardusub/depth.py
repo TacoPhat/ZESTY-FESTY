@@ -29,7 +29,7 @@ class Z_axis_PID(Node):
         self.Kp = 0
         self.Ki = 0
         self.Kd = 0
-        self.target_depth = -3.0
+        self.target_depth = 0.0
         self.error_accumulator = 0.0
         self.previous_error = 0.0
         self.timestep = 0.1

@@ -27,7 +27,9 @@ setup(
             'arm = tutorial_ardusub.bluerov2_arm:main',
             'move = tutorial_ardusub.bluerov2_move:main',
             'heading = tutorial_ardusub.heading:main',
-            'depth = tutorial_ardusub.depth:main'
+            'depth = tutorial_ardusub.depth:main',
+            '22c = tutorial_ardusub.22challenge:main',
+            'movex = tutorial_ardusub.movex:main'
         ],
     },
 )
