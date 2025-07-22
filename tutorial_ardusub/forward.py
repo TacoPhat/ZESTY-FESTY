@@ -6,7 +6,7 @@ from std_msgs.msg import Int16, Float64
 from rclpy import timer
 
 
-class Forward(Node):
+class Forward(Node): #moves forward
     def __init__(self):
         super().__init__("bluerow_publisher")
         self.pub = self.create_publisher(
