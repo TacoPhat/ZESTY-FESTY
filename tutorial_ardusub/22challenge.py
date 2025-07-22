@@ -2,7 +2,7 @@ import rclpy    # the ROS 2 client library for Python
 from rclpy.node import Node    # the ROS 2 Node class
 from rclpy.timer import Rate
 from sensor_msgs.msg import BatteryState, Imu
-from std_msgs.msg import Int16, Float64
+from std_msgs.msg import Int16, Float64, Float64MultiArray
 from mavros_msgs.msg import OverrideRCIn, ManualControl
 import numpy as np
 import math
@@ -11,9 +11,9 @@ import time
 class movenode(Node):
     def __init__(self):
         super().__init__("bluerow_control")
-        self.target_depth = -2.0
-        self.target_heading = 200.0
-        self.target_force = 5.0
+        self.target_depth = -1.0
+        self.target_heading = 70.0
+        self.target_force = 0.0
         self.depth_pub = self.create_publisher(
             Float64,
             "/desired_depth",
@@ -27,6 +27,12 @@ class movenode(Node):
         self.move_pub = self.create_publisher(
             Float64,
             "/desired_forward",
+            10
+        )
+        self.create_subscription(
+            Float64MultiArray,
+            "/desired_everything",
+            self.update_target,
             10
         )
         self.perform()
@@ -52,7 +58,7 @@ def main(args=None):
     rclpy.init(args=args)
     node = movenode()
     try:
-        rclpy.spin(node)
+        rclpy.spin_once(node)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt received, shutting down...")
     finally:

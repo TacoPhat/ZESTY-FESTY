@@ -14,7 +14,7 @@ class headingnode(Node):
         self.target_heading = 0
         self.error_accumulator = 0.0
         self.previous_error = 0.0
-        self.timestep = 0.01
+        self.timestep = 0.02
         self.rate = self.create_rate(10.0)
         self.manualcontrol_pub = self.create_publisher(
             ManualControl,

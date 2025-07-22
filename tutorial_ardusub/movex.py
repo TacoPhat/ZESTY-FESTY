@@ -23,7 +23,7 @@ class Forward(Node): #moves forward
         )
 
     def forward(self, msg):
-        self.get_logger().info(f"Applying force to {msg.data}")
+        self.get_logger().info(f"Applying force to  {msg.data}")
         move_msg = ManualControl()
         move_msg.x = msg.data
         self.pub.publish(move_msg)
