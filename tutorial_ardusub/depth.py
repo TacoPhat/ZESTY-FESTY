@@ -32,7 +32,7 @@ class Z_axis_PID(Node):
         self.target_depth = -3.0
         self.error_accumulator = 0.0
         self.previous_error = 0.0
-        self.timestep = 0.02
+        self.timestep = 0.1
     def update_target_depth(self, msg):
             self.target_depth = msg.data
             self.get_logger().info(f"[TARGET SET] New target depth: {self.target_depth:.2f}")
@@ -46,9 +46,9 @@ class Z_axis_PID(Node):
         error = (self.target_depth - current_depth)
         self.error_accumulator += error * self.timestep
         derivative = (error - self.previous_error) / self.timestep
-        Kp = 50.0
-        Ki = 0.3
-        Kd = 2.0
+        Kp = 60.0
+        Ki = 8.0
+        Kd = 0.0
         integral = min(Ki * self.error_accumulator, 1.0)
         u = Kp * error + integral + Kd * derivative
         u = max(-100, min(u, 100))
