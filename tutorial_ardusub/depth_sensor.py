@@ -6,33 +6,30 @@ from std_msgs.msg import Int16, Float64
 from rclpy import timer
 
 
-class Forward(Node):
+class Depth_Find(Node):
     def __init__(self):
         super().__init__("bluerow_publisher")
-        self.x = 0.0
-        self.pub = self.create_publisher(
-            ManualControl,
-            "/manual_control",
-            10
+        self.sub = self.create_subscription(
+            FluidPressure,        
+            "/pressure",    
+            self.calculate_depth, 
+            10             
         )
-        self.create_subscription(
+        self.depth_pub = self.create_publisher(
             Float64,
-            "/desired_forward",
-            self.forward,
+            "/depth_state",
             10
         )
 
-    def forward(self, msg):
-        self.get_logger().info(f"Applying force to  {msg.data}")
-        move_msg = ManualControl()
-        move_msg.x = msg.data
-        self.pub.publish(move_msg)
-        self.get_logger().info(f"Moving at: {msg.data}")
+    def calculate_depth(self, msg, d=1000, g=9.81, atmospheric_pressure=101325.0):
+        depth = -(msg.fluid_pressure - atmospheric_pressure) / (d * g)
+        depth_msg = Float64()
+        depth_msg.data = depth
+        self.depth_pub.publish(depth_msg)
 
 def main(args=None):
         rclpy.init(args=args)
-        node = Forward()
-
+        node = Depth_Find()
         try:
             rclpy.spin(node)
         except KeyboardInterrupt:

@@ -1,5 +1,5 @@
-import rclpy    # the ROS 2 client library for Python
-from rclpy.node import Node    # the ROS 2 Node class
+import rclpy
+from rclpy.node import Node
 from sensor_msgs.msg import FluidPressure
 from mavros_msgs.msg import ManualControl
 from std_msgs.msg import Int16, Float64
@@ -17,15 +17,15 @@ class Forward(Node):
         )
         self.create_subscription(
             Float64,
-            "/desired_forward",
-            self.forward,
+            "/desired_side",
+            self.side,
             10
         )
 
-    def forward(self, msg):
-        self.get_logger().info(f"Applying force to  {msg.data}")
+    def side(self, msg):
+        self.get_logger().info(f"Applying side force to  {msg.data}")
         move_msg = ManualControl()
-        move_msg.x = msg.data
+        move_msg.y = msg.data
         self.pub.publish(move_msg)
         self.get_logger().info(f"Moving at: {msg.data}")
 
