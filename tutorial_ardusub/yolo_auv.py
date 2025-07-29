@@ -20,7 +20,7 @@ CLASS_MAP = {
 class CameraCaptureNode(Node):
     def __init__(self):
         super().__init__('camera_capture_node')
-        self.rf = Roboflow(api_key="6LjEpf903x4FcUSJF3gG")
+        self.rf = Roboflow(api_key="")
         self.model = self.rf.workspace().project("auv-yolo-ssqex").version(1).model
         # Image capture setup
         self.bridge = CvBridge()
