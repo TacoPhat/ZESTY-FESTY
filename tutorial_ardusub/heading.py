@@ -35,10 +35,10 @@ class headingnode(Node):
         )
     def update_target_heading(self, msg):
             self.target_heading = msg.data
-            self.get_logger().info(f"[TARGET SET] New target heading: {self.target_heading:.2f}")
+            # self.get_logger().info(f"[TARGET SET] New target heading: {self.target_heading:.2f}")
 
     def face_heading(self, msg):
-        self.get_logger().info(f"Rotating to {self.target_heading}")
+        # self.get_logger().info(f"Rotating to {self.target_heading}")
         current_heading = msg.data
         error = (self.target_heading - current_heading + 180) % 360 - 180
         self.error_accumulator += error * self.timestep
@@ -53,7 +53,7 @@ class headingnode(Node):
         move_msg = ManualControl()
         move_msg.r = float(u)
         self.manualcontrol_pub.publish(move_msg)
-        self.get_logger().info(f"Current: {current_heading}, Target: {self.target_heading}, Cmd: {u:.2f}")
+        # self.get_logger().info(f"Current: {current_heading}, Target: {self.target_heading}, Cmd: {u:.2f}")
 
 def main(args=None):
     rclpy.init(args=args)
